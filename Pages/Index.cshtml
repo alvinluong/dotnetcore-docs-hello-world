@@ -4,59 +4,6 @@
     ViewData["Title"] = "Home page";
 }
 
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-
-public class HomeController : Controller
-{
-    private readonly LdapHelper _ldapHelper;
-
-    public HomeController(LdapHelper ldapHelper)
-    {
-        _ldapHelper = ldapHelper;
-    }
-
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
-    public IActionResult Login(string username, string password)
-    {
-        if (_ldapHelper.Authenticate(username, password))
-        {
-            // Authentication successful, create a user claim
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, username),
-                // Add other claims as needed
-            };
-
-            var identity = new ClaimsIdentity(claims, "custom");
-            var principal = new ClaimsPrincipal(identity);
-
-            HttpContext.SignInAsync(principal);
-
-            return RedirectToAction("Dashboard"); // Redirect to your dashboard or another page
-        }
-        else
-        {
-            // Authentication failed, handle the error (e.g., show an error message)
-            return View("Login");
-        }
-    }
-
-    [Authorize]
-    public IActionResult Dashboard()
-    {
-        return View();
-    }
-}
-
 <div class="text-center">
     <h1 class="display-4">Alvins LDAP Test</h1>
     <p class="lead">Example .NET app to Azure App Service.</p>
